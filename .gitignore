@@ -1,0 +1,11 @@
+# Xcode user data (config local de cada quien)
+xcuserdata/
+*.xcuserdata
+*.xcuserstate
+
+# Builds
+DerivedData/
+build/
+
+# macOS
+.DS_Store

@@ -47,22 +47,6 @@ struct RatingModalView: View {
         }
     }
 }
- 
-// MARK: - TouristHistoryView (placeholder)
-struct TouristHistoryView: View {
-    var body: some View {
-        NavigationStack {
-            Text("Historial de experiencias")
-                .foregroundColor(.appTextSecondary)
-                .navigationTitle("Historial")
-        }
-    }
-}
- 
-#Preview("Home") { TouristHomeView() }
-#Preview("MyExp") { TouristMyExpView() }
-#Preview("Detail") { ExperienceDetailView() }
-#Preview("Booking") { BookingView() }
 #Preview("Rating") {
     ZStack {
         Color.appGray.ignoresSafeArea()
