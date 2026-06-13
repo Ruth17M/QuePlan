@@ -6,6 +6,8 @@ final class MisReservasViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    private let service = QueplanService()
+
     var reservasActivas: [Reserva] {
         reservas.filter { $0.estado == "pendiente" || $0.estado == "confirmada" }
     }
@@ -19,7 +21,7 @@ final class MisReservasViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let reservas: [Reserva] = try await ApiClient.shared.get("/reserva/getAll/\(idCliente)")
+            let reservas = try await service.getReservas(idCliente: idCliente)
             self.reservas = reservas
         } catch {
             errorMessage = error.localizedDescription

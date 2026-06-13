@@ -12,6 +12,8 @@ final class EventosViewModel: ObservableObject {
     @Published var fechaDesde: String?
     @Published var fechaHasta: String?
 
+    private let service = QueplanService()
+
     var eventosFiltrados: [Evento] {
         var result = eventos
 
@@ -32,15 +34,11 @@ final class EventosViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        var query: [String: String] = [:]
-        if !searchText.isEmpty { query["nombre"] = searchText }
-        if let desde = fechaDesde { query["fechaDesde"] = desde }
-        if let hasta = fechaHasta { query["fechaHasta"] = hasta }
-
         do {
-            let eventos: [Evento] = try await ApiClient.shared.get(
-                "/evento/getDisponibles",
-                query: query.isEmpty ? nil : query
+            let eventos = try await service.getEventosDisponibles(
+                nombre: searchText.isEmpty ? nil : searchText,
+                fechaDesde: fechaDesde,
+                fechaHasta: fechaHasta
             )
             self.eventos = eventos
         } catch {

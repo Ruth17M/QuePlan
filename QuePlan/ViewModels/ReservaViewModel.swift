@@ -7,27 +7,23 @@ final class ReservaViewModel: ObservableObject {
     @Published var success = false
     @Published var reservaCreada: Reserva?
 
+    private let service = QueplanService()
+
     func reservar(idCliente: Int, idEvento: Int, cantidadPersonas: Int) async {
         isLoading = true
         errorMessage = nil
         success = false
 
-        print("📤 Enviando reserva - cliente:\(idCliente) evento:\(idEvento) personas:\(cantidadPersonas)")
-
-        let body = ReservaRequest(
-            idCliente: idCliente,
-            idEvento: idEvento,
-            cantidadPersonas: cantidadPersonas
-        )
-
         do {
-            let reserva: Reserva = try await ApiClient.shared.post("/reserva/save", body: body)
+            let reserva = try await service.crearReserva(
+                idCliente: idCliente,
+                idEvento: idEvento,
+                cantidadPersonas: cantidadPersonas
+            )
             reservaCreada = reserva
             success = true
-            print("✅ Reserva creada:", reserva.idReservacion ?? "nil")
         } catch {
             errorMessage = error.localizedDescription
-            print("❌ Error al reservar:", error)
         }
 
         isLoading = false

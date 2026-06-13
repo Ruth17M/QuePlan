@@ -7,14 +7,16 @@ final class DetalleViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    private let service = QueplanService()
+
     func load(idEvento: Int) async {
         isLoading = true
         errorMessage = nil
 
         do {
-            async let eventoData: Evento = ApiClient.shared.get("/evento/get/\(idEvento)")
-            async let opinionesData: [Opinion] = ApiClient.shared.get("/opinion/getByEvento/\(idEvento)")
-            (evento, opiniones) = try await (eventoData, opinionesData)
+            async let evento = service.getEvento(id: idEvento)
+            async let opiniones = service.getOpiniones(idEvento: idEvento)
+            (self.evento, self.opiniones) = try await (evento, opiniones)
         } catch {
             errorMessage = error.localizedDescription
         }
