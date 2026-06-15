@@ -39,3 +39,17 @@ struct Evento: Codable, Identifiable {
         return parts.count > 1 ? String(parts[1]) : ""
     }
 }
+
+extension Evento {
+    var fechaDate: Date? {
+        guard let fechaHora else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "es_MX")
+        return formatter.date(from: fechaHora)
+    }
+
+    var diaMes: Int {
+        Calendar.current.component(.day, from: fechaDate ?? Date())
+    }
+}

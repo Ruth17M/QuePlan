@@ -12,7 +12,7 @@ struct BusinessHomeView: View {
     @State private var selectedDay: Int = Calendar.current.component(.day, from: Date())
     @State private var showFullCal = false
 
-    // MARK: - Fecha de hoy formateada
+    // fecha de hoy formateada
     private var hoyDia: String {
         let f = DateFormatter()
         f.locale = Locale(identifier: "es_MX")
@@ -28,7 +28,7 @@ struct BusinessHomeView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
 
-                    // MARK: Header
+                    // header
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Hola, \(vm.nombreSaludo)")
@@ -56,21 +56,19 @@ struct BusinessHomeView: View {
                     .padding(.horizontal)
                     .padding(.top, 16)
 
-                    // MARK: Calendario
+                    // calendario
                     VStack(spacing: 12) {
-                        MonthPickerButton(currentMonth: $vm.currentMonth)
+                        MonthPickerButton(monthName: vm.currentMonth.mesNombre)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         if showFullCal {
                             MonthCalendarView(
                                 selectedDay: $selectedDay,
-                                currentMonth: $vm.currentMonth,
                                 highlightedDays: vm.diasConEventos
                             )
                         } else {
                             WeekCalendarView(
                                 selectedDay: $selectedDay,
-                                currentMonth: $vm.currentMonth,
                                 highlightedDays: vm.diasConEventos
                             )
                         }
@@ -115,7 +113,7 @@ struct BusinessHomeView: View {
                     }
                     .padding(.horizontal)
 
-                    // MARK: Lista de eventos
+                    //lista de eventos
                     Text("Mis actividades")
                         .font(.system(size: 18, weight: .bold))
                         .padding(.horizontal)
@@ -138,7 +136,7 @@ struct BusinessHomeView: View {
                     } else {
                         LazyVStack(spacing: 12) {
                             ForEach(vm.eventosDelDia) { evento in
-                                NavigationLink(destination: ActivityDetailView()) {
+                                NavigationLink(destination: ActivityDetailView(idEvento: evento.idEvento ?? 0)) {
                                     ActivityRowCard()
                                 }
                                 .buttonStyle(.plain)
@@ -161,5 +159,14 @@ struct BusinessHomeView: View {
                 await vm.fetchEventos()
             }
         }
+    }
+}
+
+extension Date {
+    var mesNombre: String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "es_MX")
+        f.dateFormat = "MMMM yyyy"
+        return f.string(from: self).capitalized
     }
 }

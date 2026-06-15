@@ -22,7 +22,7 @@ final class MisReservasViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let reservas = try await service.getReservas(idCliente: idCliente)
+            let reservas = try await service.getReservasCliente(idCliente: idCliente)
             self.reservas = reservas
         } catch {
             errorMessage = error.localizedDescription

@@ -10,7 +10,6 @@ import Combine
 @MainActor
 final class BusinessHomeViewModel: ObservableObject {
 
-    // MARK: - Published state
     @Published var negocio: Negocio?
     @Published var eventos: [Evento] = []
     @Published var eventosDelDia: [Evento] = []
@@ -25,76 +24,40 @@ final class BusinessHomeViewModel: ObservableObject {
         didSet { filtrarEventosDelDia(dia: diaSeleccionado) }
     }
 
-    // MARK: - Session
-    private let sessionKey = "negocio_session"
-    private let api = ApiClient.shared
+    private let service = QueplanService()
+    private let sessionKey = "sesion_negocio"
 
-    init() {
-        loadSession()
-    }
+    init() { loadSession() }
 
-    // MARK: - Login
-
-    func login(usuario: String, password: String) async {
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
-
-        struct LoginBody: Encodable {
-            let usuario: String
-            let passwordHash: String
-        }
-
-        do {
-            let result: Negocio = try await api.post(
-                "/negocio/login",
-                body: LoginBody(usuario: usuario, passwordHash: password)
-            )
-            negocio = result
-            saveSession(result)
-            await fetchEventos()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    // MARK: - Fetch eventos
-
+//fetch de eventos
     func fetchEventos() async {
         guard let id = negocio?.idNegocio else { return }
         isLoading = true
-        defer { isLoading = false }
-
+        errorMessage = nil
         do {
-            let result: [Evento] = try await api.get("/evento/getAll/\(id)")
+            let result = try await service.getEventosNegocio(idNegocio: id)
             eventos = result
             filtrarEventosDelDia(dia: diaSeleccionado)
         } catch {
             errorMessage = error.localizedDescription
         }
+        isLoading = false
     }
 
-    // MARK: - Filtrar por día
-
+//filtrado por día
     func filtrarEventosDelDia(dia: Int) {
         let cal = Calendar.current
         let mesRef = cal.dateComponents([.month, .year], from: currentMonth)
-
         eventosDelDia = eventos.filter { evento in
             guard let fecha = evento.fechaDate else { return false }
             let comp = cal.dateComponents([.day, .month, .year], from: fecha)
-            return comp.day == dia
-                && comp.month == mesRef.month
-                && comp.year == mesRef.year
+            return comp.day == dia && comp.month == mesRef.month && comp.year == mesRef.year
         }
     }
-
-    // MARK: - Días con eventos (para resaltar calendario)
 
     var diasConEventos: Set<Int> {
         let cal = Calendar.current
         let mesRef = cal.dateComponents([.month, .year], from: currentMonth)
-
         return Set(eventos.compactMap { evento -> Int? in
             guard let fecha = evento.fechaDate else { return nil }
             let comp = cal.dateComponents([.day, .month, .year], from: fecha)
@@ -103,19 +66,11 @@ final class BusinessHomeViewModel: ObservableObject {
         })
     }
 
-    // MARK: - Saludo
-
     var nombreSaludo: String {
         negocio?.nombreNegocio ?? negocio?.nombreDueno ?? "Negocio"
     }
 
-    // MARK: - Sesión persistente
-
-    private func saveSession(_ negocio: Negocio) {
-        guard let data = try? JSONEncoder().encode(negocio) else { return }
-        UserDefaults.standard.set(data, forKey: sessionKey)
-    }
-
+//sesión
     private func loadSession() {
         guard
             let data = UserDefaults.standard.data(forKey: sessionKey),
@@ -125,26 +80,18 @@ final class BusinessHomeViewModel: ObservableObject {
         Task { await fetchEventos() }
     }
 
+    func guardarSesion(_ negocio: Negocio) {
+        self.negocio = negocio
+        if let data = try? JSONEncoder().encode(negocio) {
+            UserDefaults.standard.set(data, forKey: sessionKey)
+        }
+        Task { await fetchEventos() }
+    }
+
     func logout() {
         negocio = nil
         eventos = []
         eventosDelDia = []
         UserDefaults.standard.removeObject(forKey: sessionKey)
-    }
-}
-
-// MARK: - Extensión para parsear fecha (añadir a Evento.swift si prefieres)
-
-extension Evento {
-    var fechaDate: Date? {
-        guard let fechaHora else { return nil }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        formatter.locale = Locale(identifier: "es_MX")
-        return formatter.date(from: fechaHora)
-    }
-
-    var diaMes: Int {
-        Calendar.current.component(.day, from: fechaDate ?? Date())
     }
 }

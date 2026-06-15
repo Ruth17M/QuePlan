@@ -9,11 +9,14 @@ import SwiftUI
 
 @main
 struct QuePlanApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+    @StateObject private var session = AppSession()
+
+      var body: some Scene {
+          WindowGroup {
+              RootView()
+                  .environmentObject(session)
+          }
+      }
 }
 
 

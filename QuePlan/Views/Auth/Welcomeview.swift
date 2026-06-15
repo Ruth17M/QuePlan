@@ -10,7 +10,7 @@ import SwiftUI
 struct WelcomeView: View {
     @State private var goLogin = false
     @State private var goRegister = false
- 
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -29,9 +29,9 @@ struct WelcomeView: View {
                         .padding(.bottom, 32)
                     )
                 )
- 
+
                 Spacer()
- 
+
                 VStack(spacing: 12) {
                     Text("Bienvenido")
                         .font(.system(size: 26, weight: .bold))
@@ -40,12 +40,12 @@ struct WelcomeView: View {
                         .font(.system(size: 15))
                         .foregroundColor(.appTextSecondary)
                         .padding(.bottom, 8)
- 
+
                     PrimaryButton(title: "Iniciar sesión") { goLogin = true }
                     SecondaryButton(title: "Registrarse") { goRegister = true }
                 }
                 .padding(.horizontal, 32)
- 
+
                 Spacer()
             }
             .background(Color.white.ignoresSafeArea())

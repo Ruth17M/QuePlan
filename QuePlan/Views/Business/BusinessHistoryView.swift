@@ -28,11 +28,11 @@ struct BusinessHistoryView: View {
                     .padding(.horizontal).padding(.top, 16)
  
                     VStack(spacing: 12) {
-                        MonthPickerButton(currentMonth: $currentMonth).frame(maxWidth: .infinity, alignment: .leading)
+                        MonthPickerButton(monthName: currentMonth.mesNombre).frame(maxWidth: .infinity, alignment: .leading)
                         if showFullCal {
-                            MonthCalendarView(selectedDay: $selectedDay, currentMonth: $currentMonth)
+                            MonthCalendarView(selectedDay: $selectedDay)
                         } else {
-                            WeekCalendarView(selectedDay: $selectedDay, currentMonth: $currentMonth)
+                            WeekCalendarView(selectedDay: $selectedDay)
                         }
                         Button {
                             withAnimation(.easeInOut(duration: 0.2)) { showFullCal.toggle() }
@@ -61,7 +61,7 @@ struct BusinessHistoryView: View {
  
                     LazyVStack(spacing: 12) {
                         ForEach(0..<4, id: \.self) { _ in
-                            NavigationLink(destination: ActivityDetailView()) {
+                            NavigationLink(destination: ActivityDetailView(idEvento: 0)) {
                                 ActivityRowCard()
                             }
                             .buttonStyle(.plain).padding(.horizontal)

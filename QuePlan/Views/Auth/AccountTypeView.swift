@@ -11,11 +11,11 @@ struct AccountTypeView: View {
     @State private var goBusiness = false
     @State private var goTourist = false
     @Environment(\.dismiss) var dismiss
- 
+
     var body: some View {
         ZStack(alignment: .top) {
             Color.white.ignoresSafeArea()
- 
+
             VStack(spacing: 0) {
                 HStack {
                     BackButton { dismiss() }
@@ -23,17 +23,16 @@ struct AccountTypeView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 12)
- 
 
                 VStack(spacing: 16) {
                     Image(systemName: "x.circle")
                         .resizable().scaledToFit()
                         .frame(width: 80, height: 80)
                         .foregroundColor(.appPink)
- 
+
                     Text("Bienvenido")
                         .font(.system(size: 26, weight: .bold))
- 
+
                     Text("¿Qué tipo de cuenta deseas registrar?")
                         .font(.system(size: 16))
                         .foregroundColor(.appTextSecondary)
@@ -41,27 +40,39 @@ struct AccountTypeView: View {
                         .padding(.horizontal, 40)
                 }
                 .padding(.top, 16)
- 
+
                 Spacer()
- 
+
                 ZStack(alignment: .top) {
                     Color.appPink
+
                     Ellipse()
                         .fill(Color.white)
                         .frame(width: 700, height: 80)
                         .offset(y: -40)
- 
-                    HStack(spacing: 60) {
-                        AccountTypeOption(icon: "storefront", label: "Negocio") {
-                            goBusiness = true
+
+                    VStack(spacing: 32) {
+                        HStack(spacing: 60) {
+                            AccountTypeOption(icon: "storefront", label: "Negocio") {
+                                goBusiness = true
+                            }
+                            AccountTypeOption(icon: "person", label: "Turista") {
+                                goTourist = true
+                            }
                         }
-                        AccountTypeOption(icon: "person", label: "Turista") {
-                            goTourist = true
+                        .padding(.top, 60)
+
+                        Button(action: { dismiss() }) {
+                            HStack(spacing: 6) {
+                                Text("¿Ya tienes cuenta? Inicia sesión")
+                                    .font(.system(size: 13, weight: .medium))
+                            }
+                            .foregroundColor(.white.opacity(0.85))
                         }
+                        .padding(.bottom, 24)
                     }
-                    .padding(.top, 60)
                 }
-                .frame(height: 220)
+                .frame(height: 260)
             }
         }
         .navigationBarHidden(true)
@@ -69,13 +80,12 @@ struct AccountTypeView: View {
         .navigationDestination(isPresented: $goTourist) { TouristRegisterView() }
     }
 }
- 
 
 private struct AccountTypeOption: View {
     let icon: String
     let label: String
     let action: () -> Void
- 
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 12) {
@@ -89,5 +99,7 @@ private struct AccountTypeOption: View {
         }
     }
 }
+
+#Preview { SplashView() }
  
 #Preview { SplashView() }

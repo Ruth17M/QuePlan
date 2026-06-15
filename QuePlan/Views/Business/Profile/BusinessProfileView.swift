@@ -4,19 +4,18 @@
 //
 //  Created by Ruth Manriquez on 05/06/26.
 //
-
 import SwiftUI
 
 struct BusinessProfileView: View {
+    @EnvironmentObject var session: AppSession   // ← 1. AGREGAR
     @State private var showEdit = false
     @State private var showLogout = false
- 
+
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
- 
-                    // Header rosa con nombre "Mi perfil"
+
                     ZStack(alignment: .bottom) {
                         PinkWaveHeader(height: 200)
                         Text("Mi perfil")
@@ -29,16 +28,13 @@ struct BusinessProfileView: View {
                             .offset(y: 50),
                         alignment: .bottom
                     )
- 
-                    // Contenido
+
                     VStack(alignment: .leading, spacing: 20) {
                         Spacer().frame(height: 44)
- 
-                        // Nombre del negocio (solo lectura)
+
                         ProfileReadField(label: "Nombre del negocio", value: "Juan Pedre")
                         ProfileReadField(label: "Teléfono", value: "477123456")
- 
-                        // Logo
+
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Logo")
                                 .font(.system(size: 14, weight: .medium))
@@ -51,8 +47,7 @@ struct BusinessProfileView: View {
                                     .foregroundColor(.appTextSecondary)
                             }
                         }
- 
-                        // Editar vista previa
+
                         Button {} label: {
                             HStack {
                                 Text("Editar vista previa de negocio")
@@ -64,8 +59,7 @@ struct BusinessProfileView: View {
                             .padding(14)
                             .background(Color.appGray).cornerRadius(12)
                         }
- 
-                        // Links
+
                         VStack(spacing: 6) {
                             Text("Conoce más sobre")
                                 .font(.system(size: 14)).foregroundColor(.appTextSecondary)
@@ -73,13 +67,13 @@ struct BusinessProfileView: View {
                                 .font(.system(size: 14, weight: .bold)).foregroundColor(.appPink)
                         }
                         .frame(maxWidth: .infinity)
- 
+
                         Button { showLogout = true } label: {
                             Text("¿Desea cerrar sesión?")
                                 .font(.system(size: 15)).foregroundColor(.appPink)
                         }
                         .frame(maxWidth: .infinity)
- 
+
                         HStack(spacing: 20) {
                             Button("Términos y condiciones") {}
                                 .font(.system(size: 13)).foregroundColor(.appTextSecondary)
@@ -102,7 +96,9 @@ struct BusinessProfileView: View {
                 }
             }
             .confirmationDialog("¿Cerrar sesión?", isPresented: $showLogout, titleVisibility: .visible) {
-                Button("Cerrar sesión", role: .destructive) {}
+                Button("Cerrar sesión", role: .destructive) {
+                    session.logout()   // ← 2. AGREGAR esta línea
+                }
                 Button("Cancelar", role: .cancel) {}
             }
             .sheet(isPresented: $showEdit) { EditBusinessProfileView() }
