@@ -29,18 +29,18 @@ struct TouristHistoryView: View {
                                 Text(reserva.nombreEvento ?? "Actividad")
                                     .font(.system(size: 15, weight: .semibold))
                                 Spacer()
-                                Text(reserva.estado?.capitalized ?? "")
+                                Text(viewModel.estadoDisplay(reserva))
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(
-                                        reserva.estado == "cancelada" ? .red :
-                                        reserva.estado == "completada" ? .green :
+                                        viewModel.estadoDisplay(reserva) == "Cancelada" ? .red :
+                                        viewModel.estadoDisplay(reserva) == "Completada" ? .green :
                                         .appTextSecondary
                                     )
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 2)
                                     .background(
-                                        reserva.estado == "cancelada" ? Color.red.opacity(0.1) :
-                                        reserva.estado == "completada" ? Color.green.opacity(0.1) :
+                                        viewModel.estadoDisplay(reserva) == "Cancelada" ? Color.red.opacity(0.1) :
+                                        viewModel.estadoDisplay(reserva) == "Completada" ? Color.green.opacity(0.1) :
                                         Color.gray.opacity(0.1)
                                     )
                                     .cornerRadius(6)

@@ -10,11 +10,28 @@ final class MisReservasViewModel: ObservableObject {
     private let service = QueplanService()
 
     var reservasActivas: [Reserva] {
-        reservas.filter { $0.estado == "pendiente" || $0.estado == "confirmada" }
+        reservas.filter {
+            ($0.estado == "pendiente" || $0.estado == "confirmada") && !esPasada($0)
+        }
     }
 
     var reservasHistorial: [Reserva] {
-        reservas.filter { $0.estado == "cancelada" || $0.estado == "completada" }
+        reservas.filter {
+            $0.estado == "cancelada" || $0.estado == "completada" || esPasada($0)
+        }
+    }
+
+    func estadoDisplay(_ reserva: Reserva) -> String {
+        if esPasada(reserva) { return "Completada" }
+        return reserva.estado?.capitalized ?? ""
+    }
+
+    private func esPasada(_ reserva: Reserva) -> Bool {
+        guard let fecha = reserva.fechaHora else { return false }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        guard let fechaDate = formatter.date(from: fecha) else { return false }
+        return fechaDate < Date() && reserva.estado == "confirmada"
     }
 
     func load(idCliente: Int) async {
