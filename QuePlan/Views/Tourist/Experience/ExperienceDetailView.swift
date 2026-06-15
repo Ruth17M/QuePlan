@@ -1,14 +1,13 @@
 import SwiftUI
 
 struct ExperienceDetailView: View {
+    @EnvironmentObject var session: AppSession
     let evento: Evento
 
     @StateObject private var viewModel = DetalleViewModel()
     @State private var showBooking = false
     @State private var isFavorite = false
     @Environment(\.dismiss) var dismiss
-
-    private let clienteId = 1
 
     var body: some View {
         ZStack {

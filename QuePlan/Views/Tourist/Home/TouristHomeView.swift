@@ -1,10 +1,9 @@
 import SwiftUI
 
 struct TouristHomeView: View {
+    @EnvironmentObject var session: AppSession
     @StateObject private var viewModel = EventosViewModel()
     @State private var showFilter = false
-
-    private let clienteId = 1
 
     var body: some View {
         NavigationStack {
@@ -14,7 +13,7 @@ struct TouristHomeView: View {
                     // Header
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Hola, Ruth")
+                            Text("Hola, \(session.cliente?.nombre ?? "Turista")")
                                 .font(.system(size: 24, weight: .bold))
                             Text("Descubre, reserva y vive experiencias.")
                                 .font(.system(size: 14))

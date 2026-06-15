@@ -1,9 +1,8 @@
 import SwiftUI
 
 struct TouristHistoryView: View {
+    @EnvironmentObject var session: AppSession
     @StateObject private var viewModel = MisReservasViewModel()
-
-    private let clienteId = 1
 
     var body: some View {
         NavigationStack {
@@ -60,6 +59,6 @@ struct TouristHistoryView: View {
             }
             .navigationTitle("Historial")
         }
-        .task { await viewModel.load(idCliente: clienteId) }
+        .task { await viewModel.load(idCliente: session.cliente?.idCliente ?? 0) }
     }
 }

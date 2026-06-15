@@ -1,11 +1,10 @@
 import SwiftUI
 
 struct TouristMyExpView: View {
+    @EnvironmentObject var session: AppSession
     @StateObject private var viewModel = MisReservasViewModel()
-    @State private var selectedDay = 2
+    @State private var selectedDay = Calendar.current.component(.day, from: Date())
     @State private var showFullCal = false
-
-    private let clienteId = 1
 
     var body: some View {
         NavigationStack {
@@ -15,7 +14,7 @@ struct TouristMyExpView: View {
                     // Header
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Hola, Ruth")
+                            Text("Hola, \(session.cliente?.nombre ?? "Turista")")
                                 .font(.system(size: 22, weight: .bold))
                             Text("Descubre, reserva y vive experiencias.")
                                 .font(.system(size: 13))
@@ -52,11 +51,12 @@ struct TouristMyExpView: View {
 
                     // Día seleccionado
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text("15")
+                        Text("\(selectedDay)")
                             .font(.system(size: 42, weight: .bold))
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 6) {
-                                Text("Dom")
+                                let formatter = DateFormatter()
+                                Text(formatter.veryShortWeekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1].capitalized)
                                     .font(.system(size: 16, weight: .semibold))
                                 Text("Hoy")
                                     .font(.system(size: 15))
@@ -102,7 +102,7 @@ struct TouristMyExpView: View {
                 .padding(.bottom, 24)
             }
             .background(Color.white)
-            .task { await viewModel.load(idCliente: clienteId) }
+            .task { await viewModel.load(idCliente: session.cliente?.idCliente ?? 0) }
         }
     }
 }

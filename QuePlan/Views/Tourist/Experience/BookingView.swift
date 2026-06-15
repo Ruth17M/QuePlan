@@ -1,13 +1,12 @@
 import SwiftUI
 
 struct BookingView: View {
+    @EnvironmentObject var session: AppSession
     let evento: Evento
 
     @StateObject private var viewModel = ReservaViewModel()
     @State private var people = 1
     @Environment(\.dismiss) var dismiss
-
-    private let clienteId = 1
 
     var body: some View {
         VStack(spacing: 0) {
@@ -163,7 +162,7 @@ struct BookingView: View {
                     } else {
                         Task {
                             await viewModel.reservar(
-                                idCliente: clienteId,
+                                idCliente: session.cliente?.idCliente ?? 0,
                                 idEvento: evento.idEvento ?? 0,
                                 cantidadPersonas: people
                             )
