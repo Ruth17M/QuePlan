@@ -10,6 +10,7 @@ import SwiftUI
 struct BusinessHistoryView: View {
     @State private var selectedDay = 2
     @State private var showFullCal = false
+    @State private var currentMonth: Date = Date()
  
     var body: some View {
         NavigationStack {
@@ -27,11 +28,11 @@ struct BusinessHistoryView: View {
                     .padding(.horizontal).padding(.top, 16)
  
                     VStack(spacing: 12) {
-                        MonthPickerButton().frame(maxWidth: .infinity, alignment: .leading)
+                        MonthPickerButton(currentMonth: $currentMonth).frame(maxWidth: .infinity, alignment: .leading)
                         if showFullCal {
-                            MonthCalendarView(selectedDay: $selectedDay)
+                            MonthCalendarView(selectedDay: $selectedDay, currentMonth: $currentMonth)
                         } else {
-                            WeekCalendarView(selectedDay: $selectedDay)
+                            WeekCalendarView(selectedDay: $selectedDay, currentMonth: $currentMonth)
                         }
                         Button {
                             withAnimation(.easeInOut(duration: 0.2)) { showFullCal.toggle() }
