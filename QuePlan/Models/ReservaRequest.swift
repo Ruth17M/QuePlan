@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 struct ReservaRequest: Codable {
     let idCliente: Int

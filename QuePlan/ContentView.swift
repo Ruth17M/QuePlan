@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-       // SplashView()
-       TouristTabView()
+        SplashView()
+      // TouristTabView()
    // BusinessTabView()
     }
 }

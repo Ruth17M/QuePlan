@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 final class QueplanService {
     func getEventosDisponibles(nombre: String? = nil, fechaDesde: String? = nil, fechaHasta: String? = nil) async throws -> [Evento] {
