@@ -39,10 +39,10 @@ struct MonthCalendarView: View {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
                 ForEach(Array(daysInMonth.enumerated()), id: \.offset) { _, day in
                     if let d = day {
-                        let isSelected = d == selectedDay
                         let isHighlighted = highlightedDays.contains(d)
+                        let isSelected = d == selectedDay && isHighlighted
                         Button {
-                            selectedDay = d
+                            if highlightedDays.contains(d) { selectedDay = d }
                         } label: {
                             Text("\(d)")
                                 .font(.system(size: 13, weight: isHighlighted ? .bold : .regular))

@@ -18,9 +18,6 @@ struct MonthPickerButton: View {
             Text(monthName)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.appTextPrimary)
-            Image(systemName: "chevron.down")
-                .foregroundColor(.appTextPrimary)
-                .font(.system(size: 12, weight: .medium))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 9)

@@ -35,10 +35,10 @@ struct WeekCalendarView: View {
             }
             HStack {
                 ForEach(Array(weekNumbers.enumerated()), id: \.offset) { i, num in
-                    let isSelected = num == selectedDay
                     let isHighlighted = highlightedDays.contains(num)
+                    let isSelected = num == selectedDay && isHighlighted
                     Button {
-                        selectedDay = num
+                        if highlightedDays.contains(num) { selectedDay = num }
                     } label: {
                         Text("\(num)")
                             .font(.system(size: 14, weight: isSelected || isHighlighted ? .bold : .regular))
