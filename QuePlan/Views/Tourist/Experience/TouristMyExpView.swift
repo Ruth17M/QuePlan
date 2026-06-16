@@ -4,7 +4,17 @@ struct TouristMyExpView: View {
     @EnvironmentObject var session: AppSession
     @StateObject private var viewModel = MisReservasViewModel()
     @State private var selectedDay = Calendar.current.component(.day, from: Date())
+    @State private var currentMonth: Date = Date()
     @State private var showFullCal = false
+
+    private var diasConReservas: Set<Int> {
+        Set(viewModel.reservasActivas.compactMap { reserva in
+            guard let fecha = reserva.fechaHora else { return nil }
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            return formatter.date(from: fecha).map { Calendar.current.component(.day, from: $0) }
+        })
+    }
 
     var body: some View {
         NavigationStack {
@@ -28,13 +38,13 @@ struct TouristMyExpView: View {
 
                     // Calendario
                     VStack(spacing: 12) {
-                        MonthPickerButton()
+                        MonthPickerButton(monthName: nombreMes(currentMonth))
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         if showFullCal {
-                            MonthCalendarView(selectedDay: $selectedDay)
+                            MonthCalendarView(selectedDay: $selectedDay, highlightedDays: diasConReservas, month: currentMonth)
                         } else {
-                            WeekCalendarView(selectedDay: $selectedDay)
+                            WeekCalendarView(selectedDay: $selectedDay, highlightedDays: diasConReservas)
                         }
 
                         Button {
@@ -55,12 +65,13 @@ struct TouristMyExpView: View {
                             .font(.system(size: 42, weight: .bold))
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 6) {
-                                let formatter = DateFormatter()
-                                Text(formatter.veryShortWeekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1].capitalized)
+                                Text(nombreDia(Date()))
                                     .font(.system(size: 16, weight: .semibold))
-                                Text("Hoy")
-                                    .font(.system(size: 15))
-                                    .foregroundColor(.appTextSecondary)
+                                if selectedDay == Calendar.current.component(.day, from: Date()) {
+                                    Text("Hoy")
+                                        .font(.system(size: 15))
+                                        .foregroundColor(.appTextSecondary)
+                                }
                             }
                             Text("\(viewModel.reservasActivas.count) \(viewModel.reservasActivas.count == 1 ? "tour programado" : "tours programados")")
                                 .font(.system(size: 13))
@@ -104,6 +115,19 @@ struct TouristMyExpView: View {
             .background(Color.white)
             .task { await viewModel.load(idCliente: session.cliente?.idCliente ?? 0) }
         }
+    }
+
+    private func nombreMes(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "es_MX")
+        f.dateFormat = "MMMM yyyy"
+        return f.string(from: date).capitalized
+    }
+
+    private func nombreDia(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "es_MX")
+        return f.shortWeekdaySymbols[Calendar.current.component(.weekday, from: date) - 1].capitalized
     }
 }
 

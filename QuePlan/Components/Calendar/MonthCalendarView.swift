@@ -9,15 +9,21 @@ import SwiftUI
 
 struct MonthCalendarView: View {
     @Binding var selectedDay: Int
-    var highlightedDays: Set<Int> = [2, 6, 11, 16, 18, 29]
- 
+    var highlightedDays: Set<Int> = []
+    var month: Date = Date()
+
     private let weekLetters = ["D","L","M","W","J","V","S"]
-    private let days: [Int?] = [
-        nil,nil,2,3,4,5,6,
-        nil,nil,nil,11,nil,nil,nil,
-        15,16,nil,18,nil,nil,nil,
-        29,nil,31
-    ]
+
+    private var daysInMonth: [Int?] {
+        let calendar = Calendar.current
+        let comps = calendar.dateComponents([.year, .month], from: month)
+        guard let firstDay = calendar.date(from: comps),
+              let range = calendar.range(of: .day, in: .month, for: month) else { return [] }
+        let weekday = calendar.component(.weekday, from: firstDay) - 1
+        var result: [Int?] = Array(repeating: nil, count: weekday)
+        for d in range { result.append(d) }
+        return result
+    }
  
     var body: some View {
         VStack(spacing: 8) {
@@ -31,7 +37,7 @@ struct MonthCalendarView: View {
             }
  
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
-                ForEach(Array(days.enumerated()), id: \.offset) { _, day in
+                ForEach(Array(daysInMonth.enumerated()), id: \.offset) { _, day in
                     if let d = day {
                         let isSelected = d == selectedDay
                         let isHighlighted = highlightedDays.contains(d)

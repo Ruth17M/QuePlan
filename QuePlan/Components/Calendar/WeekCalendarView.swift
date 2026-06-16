@@ -9,10 +9,19 @@ import SwiftUI
 
 struct WeekCalendarView: View {
     @Binding var selectedDay: Int
-    var highlightedDays: Set<Int> = [2, 6]
- 
+    var highlightedDays: Set<Int> = []
+
     private let weekLetters = ["D","L","M","W","J","V","S"]
-    private let weekNumbers = [1,2,3,4,5,6,7]
+
+    private var weekNumbers: [Int] {
+        let calendar = Calendar.current
+        let today = Date()
+        let weekday = calendar.component(.weekday, from: today)
+        let startOfWeek = calendar.date(byAdding: .day, value: -(weekday - 1), to: today)!
+        return (0..<7).compactMap {
+            calendar.component(.day, from: calendar.date(byAdding: .day, value: $0, to: startOfWeek)!)
+        }
+    }
  
     var body: some View {
         VStack(spacing: 4) {
