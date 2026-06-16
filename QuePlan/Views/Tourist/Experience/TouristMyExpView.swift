@@ -7,12 +7,30 @@ struct TouristMyExpView: View {
     @State private var currentMonth: Date = Date()
     @State private var showFullCal = false
 
-    private var diasConReservas: Set<Int> {
+    private var reservasDelDia: [Reserva] {
+        viewModel.reservasActivas.filter { reserva in
+            guard let fecha = reserva.fechaHora else { return false }
+            let f = DateFormatter()
+            f.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            guard let date = f.date(from: fecha) else { return false }
+            return Calendar.current.isDate(date, equalTo: fechaDelMes(selectedDay), toGranularity: .day)
+        }
+    }
+
+    private func fechaDelMes(_ day: Int) -> Date {
+        var comps = Calendar.current.dateComponents([.year, .month], from: currentMonth)
+        comps.day = day
+        return Calendar.current.date(from: comps) ?? Date()
+    }
+
+    private func diasConReservas(en mes: Date) -> Set<Int> {
         Set(viewModel.reservasActivas.compactMap { reserva in
             guard let fecha = reserva.fechaHora else { return nil }
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            return formatter.date(from: fecha).map { Calendar.current.component(.day, from: $0) }
+            let f = DateFormatter()
+            f.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            guard let date = f.date(from: fecha) else { return nil }
+            guard Calendar.current.isDate(date, equalTo: mes, toGranularity: .month) else { return nil }
+            return Calendar.current.component(.day, from: date)
         })
     }
 
@@ -38,13 +56,30 @@ struct TouristMyExpView: View {
 
                     // Calendario
                     VStack(spacing: 12) {
-                        MonthPickerButton(monthName: nombreMes(currentMonth))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        HStack {
+                            Button {
+                                withAnimation { currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth }
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.appPink)
+                            }
+                            Spacer()
+                            MonthPickerButton(monthName: nombreMes(currentMonth))
+                            Spacer()
+                            Button {
+                                withAnimation { currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth }
+                            } label: {
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.appPink)
+                            }
+                        }
 
                         if showFullCal {
-                            MonthCalendarView(selectedDay: $selectedDay, highlightedDays: diasConReservas, month: currentMonth)
+                            MonthCalendarView(selectedDay: $selectedDay, highlightedDays: diasConReservas(en: currentMonth), month: currentMonth)
                         } else {
-                            WeekCalendarView(selectedDay: $selectedDay, highlightedDays: diasConReservas)
+                            WeekCalendarView(selectedDay: $selectedDay, highlightedDays: diasConReservas(en: currentMonth))
                         }
 
                         Button {
@@ -65,15 +100,15 @@ struct TouristMyExpView: View {
                             .font(.system(size: 42, weight: .bold))
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 6) {
-                                Text(nombreDia(Date()))
+                                Text(nombreDia(fechaDelMes(selectedDay)))
                                     .font(.system(size: 16, weight: .semibold))
-                                if selectedDay == Calendar.current.component(.day, from: Date()) {
+                                if Calendar.current.isDateInToday(fechaDelMes(selectedDay)) {
                                     Text("Hoy")
                                         .font(.system(size: 15))
                                         .foregroundColor(.appTextSecondary)
                                 }
                             }
-                            Text("\(viewModel.reservasActivas.count) \(viewModel.reservasActivas.count == 1 ? "tour programado" : "tours programados")")
+                            Text("\(reservasDelDia.count) \(reservasDelDia.count == 1 ? "tour programado" : "tours programados")")
                                 .font(.system(size: 13))
                                 .foregroundColor(.appTextSecondary)
                         }
@@ -84,16 +119,15 @@ struct TouristMyExpView: View {
                         .font(.system(size: 18, weight: .bold))
                         .padding(.horizontal)
 
-                    // Estado de carga
+                    // Scroll horizontal de tarjetas
                     if viewModel.isLoading {
                         ProgressView()
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 20)
-                    }
-
-                    // Scroll horizontal de tarjetas
-                    if viewModel.reservasActivas.isEmpty && !viewModel.isLoading {
-                        Text("No tienes reservas activas")
+                    } else if reservasDelDia.isEmpty {
+                        Text(viewModel.reservasActivas.isEmpty
+                             ? "No tienes reservas activas"
+                             : "Sin actividades para este día")
                             .font(.system(size: 14))
                             .foregroundColor(.appTextSecondary)
                             .frame(maxWidth: .infinity)
@@ -101,7 +135,7 @@ struct TouristMyExpView: View {
                     } else {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 14) {
-                                ForEach(viewModel.reservasActivas) { reserva in
+                                ForEach(reservasDelDia) { reserva in
                                     MyExpCard(reserva: reserva)
                                         .frame(width: 220)
                                 }
